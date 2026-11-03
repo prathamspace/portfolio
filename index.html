@@ -657,6 +657,8 @@
             padding: 0 150px;
             position: relative;
             overflow: hidden;
+            /* Own stacking context, so .hero-bg (z-index: -1) paints above the sky gradient */
+            isolation: isolate;
         }
 
         .hero-bg {
@@ -1611,13 +1613,23 @@
 
 
         /* Snow caps animation */
+        /* Caps glow around their own layer's level instead of jumping to full brightness,
+           so they stay part of the ridge they sit on rather than floating above it */
         .snow-cap {
+            --cap: 0.5;
+            opacity: var(--cap);
             animation: snowGlow 4s ease-in-out infinite;
         }
 
+        .mountain-back .snow-cap { --cap: 0.35; }
+        .mountain-mid .snow-cap { --cap: 0.5; }
+
+        :root[data-theme="light"] .mountain-back .snow-cap { --cap: 0.6; }
+        :root[data-theme="light"] .mountain-mid .snow-cap { --cap: 0.75; }
+
         @keyframes snowGlow {
-            0%, 100% { opacity: 0.9; }
-            50% { opacity: 1; filter: drop-shadow(0 0 10px rgba(232, 238, 244, 0.5)); }
+            0%, 100% { opacity: var(--cap); }
+            50% { opacity: calc(var(--cap) + 0.15); filter: drop-shadow(0 0 6px rgba(232, 238, 244, 0.35)); }
         }
 
         /* Floating clouds */
@@ -2465,6 +2477,45 @@
                 align-items: center;
             }
         }
+
+
+        /* Keep the nav on one line as the window narrows */
+        @media (max-width: 1200px) {
+            .nav-links { gap: 26px; }
+            .nav-links a { font-size: 13px; }
+        }
+
+        @media (max-width: 1024px) {
+            .navbar,
+            .navbar.scrolled { padding-left: 30px; padding-right: 30px; }
+            .nav-links { gap: 18px; }
+            .nav-links a::before { display: none; }
+        }
+
+        @media (max-width: 860px) {
+            .nav-links { display: none; }
+        }
+
+        @media (max-width: 1024px) {
+            .mountain-layer {
+                width: 180%;
+                left: -40%;
+            }
+        }
+
+        /* Phones: draw the 1440-wide ridges at a natural width instead of squeezing them,
+           and keep them below the hero copy */
+        @media (max-width: 768px) {
+            .mountain-layer {
+                width: 300%;
+                left: -100%;
+            }
+
+            .mountain-back { height: 42% !important; }
+            .mountain-mid { height: 34% !important; }
+            .mountain-front { height: 26% !important; }
+            .mountain-closest { height: 18% !important; }
+        }
     </style>
 </head>
 <body>
@@ -2706,7 +2757,7 @@
                     </defs>
                     <path fill="url(#mountainBack)" d="M0,400 L0,280 L120,200 L200,250 L280,180 L360,220 L440,140 L520,190 L600,120 L680,170 L760,100 L840,150 L920,80 L1000,130 L1080,60 L1160,110 L1240,50 L1320,100 L1440,30 L1440,400 Z"/>
                     <!-- Snow caps -->
-                    <path class="snow-cap" fill="#E8EEF4" opacity="0.6" d="M440,140 L460,155 L420,155 Z M600,120 L625,140 L575,140 Z M760,100 L790,125 L730,125 Z M920,80 L955,110 L885,110 Z M1080,60 L1120,95 L1040,95 Z M1240,50 L1285,90 L1195,90 Z"/>
+                    <path class="snow-cap" fill="#E8EEF4" opacity="0.6" d="M440,140 L460,155 L452,149.3 L444,153.8 L436,149.3 L428,153.8 L420,155 Z M600,120 L625,140 L615,132.4 L605,138.4 L595,132.4 L585,138.4 L575,140 Z M760,100 L790,125 L778,115.5 L766,123 L754,115.5 L742,123 L730,125 Z M920,80 L955,110 L941,98.6 L927,107.6 L913,98.6 L899,107.6 L885,110 Z M1080,60 L1120,95 L1104,81.7 L1088,92.2 L1072,81.7 L1056,92.2 L1040,95 Z M1240,50 L1285,90 L1267,74.8 L1249,86.8 L1231,74.8 L1213,86.8 L1195,90 Z"/>
                 </svg>
 
                 <!-- Mid Mountains -->
@@ -2719,7 +2770,7 @@
                     </defs>
                     <path fill="url(#mountainMid)" d="M0,400 L0,300 L80,240 L160,280 L240,200 L320,250 L400,180 L480,230 L560,150 L640,200 L720,130 L800,180 L880,110 L960,160 L1040,90 L1120,140 L1200,70 L1280,120 L1360,60 L1440,100 L1440,400 Z"/>
                     <!-- Snow caps -->
-                    <path class="snow-cap" fill="#E8EEF4" opacity="0.7" d="M240,200 L265,225 L215,225 Z M400,180 L430,210 L370,210 Z M560,150 L595,185 L525,185 Z M720,130 L760,170 L680,170 Z M880,110 L925,155 L835,155 Z M1040,90 L1090,140 L990,140 Z M1200,70 L1255,125 L1145,125 Z M1360,60 L1420,120 L1300,120 Z"/>
+                    <path class="snow-cap" fill="#E8EEF4" opacity="0.7" d="M240,200 L265,225 L255,215.5 L245,223 L235,215.5 L225,223 L215,225 Z M400,180 L430,210 L418,198.6 L406,207.6 L394,198.6 L382,207.6 L370,210 Z M560,150 L595,185 L581,171.7 L567,182.2 L553,171.7 L539,182.2 L525,185 Z M720,130 L760,170 L744,154.8 L728,166.8 L712,154.8 L696,166.8 L680,170 Z M880,110 L925,155 L907,137.9 L889,151.4 L871,137.9 L853,151.4 L835,155 Z M1040,90 L1090,140 L1070,121 L1050,136 L1030,121 L1010,136 L990,140 Z M1200,70 L1255,125 L1233,104.1 L1211,120.6 L1189,104.1 L1167,120.6 L1145,125 Z M1360,60 L1420,120 L1396,97.2 L1372,115.2 L1348,97.2 L1324,115.2 L1300,120 Z"/>
                 </svg>
 
                 <!-- Front Mountains -->
